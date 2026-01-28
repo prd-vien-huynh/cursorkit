@@ -1,0 +1,351 @@
+---
+name: ui-styling
+description: Create beautiful, accessible user interfaces with @paradoxai/ui components, UnoCSS utility-first styling, and canvas-based visual designs. Use when building user interfaces in Nuxt 3, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, or establishing consistent styling patterns across applications.
+license: MIT
+version: 1.0.0
+---
+
+# UI Styling Skill
+
+Comprehensive skill for creating beautiful, accessible user interfaces in Nuxt 3 combining @paradoxai/ui components, UnoCSS utility styling, and canvas-based visual design systems.
+
+## Reference
+
+- @paradoxai/ui: Component library documentation
+- UnoCSS: https://unocss.dev
+- Element Plus: https://element-plus.org
+- Vue 3: https://vuejs.org
+
+## When to Use This Skill
+
+Use when:
+- Building UI with Nuxt 3 and Vue 3 Composition API
+- Implementing accessible components (dialogs, forms, tables, navigation)
+- Styling with UnoCSS utility-first CSS approach
+- Creating responsive, mobile-first layouts
+- Working with @paradoxai/ui component library
+- Using Element Plus components
+- Implementing design systems with consistent tokens
+- Generating visual designs, posters, or brand materials
+- Rapid prototyping with immediate visual feedback
+- Adding complex UI patterns (data tables, charts, command palettes)
+
+## Core Stack
+
+### Component Layer: @paradoxai/ui
+- Pre-built accessible components with `Ol` prefix (e.g., `OlButton`, `OlDialog`, `OlInput`)
+- Auto-imported in Nuxt 3 (no explicit imports needed)
+- TypeScript-first with full type safety
+- Composable primitives for complex UIs
+- Element Plus integration for additional components
+
+### Styling Layer: UnoCSS
+- Utility-first CSS framework (Tailwind-compatible syntax)
+- Build-time processing with zero runtime overhead
+- Mobile-first responsive design
+- Consistent design tokens from `@paradoxai/design-tokens`
+- Automatic dead code elimination
+- `:uno:` prefix for class compilation
+
+### Visual Design Layer: Canvas
+- Museum-quality visual compositions
+- Philosophy-driven design approach
+- Sophisticated visual communication
+- Minimal text, maximum visual impact
+- Systematic patterns and refined aesthetics
+
+## Quick Start
+
+### Component + Styling Setup
+
+**Components are auto-imported in Nuxt 3:**
+
+```vue
+<script setup lang="ts">
+const dialogVisible = ref(false)
+</script>
+
+<template>
+  <OlButton @click="dialogVisible = true">Open Dialog</OlButton>
+  <OlDialog v-model="dialogVisible" title="Example">
+    Content here
+  </OlDialog>
+</template>
+```
+
+**UnoCSS is configured per area:**
+
+```vue
+<template>
+  <div class=":uno: flex flex-col sm:flex-row gap-4 p-6">
+    <div class=":uno: bg-grey-100 rounded-lg p-4">
+      Content
+    </div>
+  </div>
+</template>
+```
+
+**Reference:** See `areas/common/uno.config.js` for UnoCSS configuration.
+
+## Component Library Guide
+
+**Comprehensive component catalog with usage patterns, props, and composition examples.**
+
+See: `references/olivia-components.md`
+
+Covers:
+- Form & input components (OlButton, OlInput, OlSelect, OlCheckbox, OlForm, OlFormItem)
+- Layout & navigation (OlCard, OlTabs, OlAccordion, OlDrawer)
+- Overlays & dialogs (OlDialog, OlDrawer, OlPopover, OlToast)
+- Feedback & status (OlAlert, OlProgress, OlSkeleton)
+- Display components (OlTable, OlDataTable, OlAvatar, OlBadge)
+- Element Plus components (ElButton, ElInput, ElSelect, etc.)
+
+## Responsive Design
+
+**Mobile-first breakpoints, responsive utilities, and adaptive layouts using UnoCSS.**
+
+See: `references/uno-responsive.md`
+
+Covers:
+- Mobile-first approach
+- Breakpoint system (xs: 576px, sm: 768px, md: 992px, lg: 1200px, xl: 1440px)
+- Responsive utility patterns
+- Variant groups `sm:(flex flex-col)`
+- Max-width queries `max-sm:`, `<sm:`
+- Container queries
+- Project-specific responsive patterns
+
+## Visual Design System
+
+**Canvas-based design philosophy, visual communication principles, and sophisticated compositions.**
+
+See: `references/canvas-design-system.md`
+
+Covers:
+- Design philosophy approach
+- Visual communication over text
+- Systematic patterns and composition
+- Color, form, and spatial design
+- Minimal text integration
+- Museum-quality execution
+- Multi-page design systems
+
+## Best Practices
+
+1. **Component Composition**: Build complex UIs from simple, composable primitives
+2. **Utility-First Styling**: Use UnoCSS classes with `:uno:` prefix; extract components only for true repetition
+3. **Mobile-First Responsive**: Start with mobile styles, layer responsive variants
+4. **Accessibility-First**: Leverage component library primitives, add focus states, use semantic HTML
+5. **Design Tokens**: Use consistent spacing scale, color palettes, typography system from `@paradoxai/design-tokens`
+6. **Auto-Import**: Leverage Nuxt 3 auto-imports for components (no explicit imports needed)
+7. **TypeScript**: Use full type safety for better DX
+8. **UnoCSS Prefix**: Always use `:uno:` prefix for UnoCSS classes in templates
+9. **Variant Groups**: Use variant groups `sm:(...)` for cleaner responsive code
+10. **Expert Craftsmanship**: Every detail matters - treat UI as a craft
+
+## Reference Navigation
+
+**Component Library**
+- `references/olivia-components.md` - Complete @paradoxai/ui component catalog
+
+**Styling System**
+- `references/uno-responsive.md` - Responsive design with UnoCSS
+
+**Visual Design**
+- `references/canvas-design-system.md` - Design philosophy and canvas workflows
+
+## Common Patterns
+
+**Form with validation:**
+
+```vue
+<script setup lang="ts">
+import { useForm } from '#common/composables'
+
+const formData = ref({
+  email: '',
+  password: '',
+})
+
+const { validate, errors } = useForm(templateRef, schema, () => formData.value)
+</script>
+
+<template>
+  <OlForm :model="formData">
+    <OlFormItem label="Email" prop="email" :error="errors.email">
+      <OlInput v-model="formData.email" type="email" />
+    </OlFormItem>
+    
+    <OlFormItem label="Password" prop="password" :error="errors.password">
+      <OlInput v-model="formData.password" type="password" />
+    </OlFormItem>
+    
+    <OlFormItem>
+      <ElButton type="primary" @click="validate">Submit</ElButton>
+    </OlFormItem>
+  </OlForm>
+</template>
+```
+
+**Responsive layout:**
+
+```vue
+<template>
+  <div class=":uno: min-h-screen bg-white">
+    <div class=":uno: container mx-auto px-4 py-8">
+      <div class=":uno: grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <OlCard class=":uno: bg-white border-grey-300">
+          <OlCardContent class=":uno: p-6">
+            <h3 class=":uno: text-xl font-semibold text-grey-900">
+              Content
+            </h3>
+          </OlCardContent>
+        </OlCard>
+      </div>
+    </div>
+  </div>
+</template>
+```
+
+**Dialog with responsive behavior:**
+
+```vue
+<script setup lang="ts">
+const dialogVisible = ref(false)
+</script>
+
+<template>
+  <OlButton @click="dialogVisible = true">Open Dialog</OlButton>
+  
+  <OlDialog
+    v-model="dialogVisible"
+    title="Example Dialog"
+    :width="isMobile ? '100%' : '600px'"
+  >
+    <template #default>
+      <div class=":uno: p-6">
+        Dialog content
+      </div>
+    </template>
+    
+    <template #footer>
+      <ElButton @click="dialogVisible = false">Cancel</ElButton>
+      <ElButton type="primary" @click="handleSubmit">Submit</ElButton>
+    </template>
+  </OlDialog>
+</template>
+```
+
+**Responsive grid with variant groups:**
+
+```vue
+<template>
+  <div class=":uno: grid grid-cols-1 sm:(grid-cols-2 gap-4) lg:(grid-cols-3 gap-6)">
+    <OlCard v-for="item in items" :key="item.id">
+      <OlCardContent class=":uno: p-4 sm:p-6">
+        {{ item.title }}
+      </OlCardContent>
+    </OlCard>
+  </div>
+</template>
+```
+
+**Page layout pattern:**
+
+```vue
+<template>
+  <PageContent
+    :left="leftSize"
+    :ui="{
+      wrapper: ':uno: flex flex-col flex-1 gap-2 p-md lt-sm:p-0 sm:(grid grid-cols-$nav-cols gap-4)',
+      container: ':uno: flex flex-col h-full sm:(grid grid-cols-$grid-cols)',
+      left: ':uno: flex flex-col h-full overflow-hidden p-md sm:(flex-1 border-r border-grey-400)',
+      body: ':uno: flex flex-col h-full overflow-hidden p-md sm:flex-1',
+    }"
+  >
+    <template #left>
+      <PageContentNav>
+        <!-- Sidebar content -->
+      </PageContentNav>
+    </template>
+    
+    <template #default>
+      <!-- Main content -->
+    </template>
+  </PageContent>
+</template>
+```
+
+## Design Tokens
+
+The project uses design tokens from `@paradoxai/design-tokens`:
+
+**Semantic Colors:**
+- `primary` - Primary brand color (#25c9d0)
+- `success` - Success states (#39d279)
+- `danger` - Error/danger states (#e52d2d)
+- `warning` - Warning states (#f5a623)
+- `info` - Informational states
+
+**Base Colors:**
+- `grey` - Neutral grayscale colors
+- `blue`, `red`, `green`, `yellow` - Color palettes
+
+**Color Shades:**
+Each color palette includes shades from 50 (lightest) to 900 (darkest):
+- `50`, `100`, `200`, `300`, `400`, `500` (default), `600`, `700`, `800`, `900`
+
+**Usage:**
+```vue
+<template>
+  <div class=":uno: bg-primary-500 text-white">
+    Primary background
+  </div>
+  <div class=":uno: bg-grey-100 border-grey-300">
+    Grey background with border
+  </div>
+</template>
+```
+
+## UnoCSS Configuration
+
+UnoCSS is configured per area with:
+- `presetWind3` - Tailwind-compatible utilities
+- `presetParadoxUi` - Project-specific presets
+- `transformerCompileClass` - `:uno:` prefix transformer
+- `transformerDirectives` - CSS directive support
+- `transformerVariantGroup` - Variant group support
+
+**Reference:** See `areas/common/uno.config.js` for full configuration.
+
+## Component Auto-Import
+
+Nuxt 3 automatically imports:
+- All `Ol*` components from `@paradoxai/ui`
+- All `El*` components from Element Plus
+- Vue 3 Composition API functions
+- Nuxt composables
+
+No explicit imports needed:
+```vue
+<script setup lang="ts">
+// ref, computed, watch, etc. are auto-imported
+const count = ref(0)
+const doubled = computed(() => count.value * 2)
+</script>
+
+<template>
+  <!-- OlButton, OlDialog, etc. are auto-imported -->
+  <OlButton @click="count++">Click</OlButton>
+</template>
+```
+
+## Resources
+
+- UnoCSS Docs: https://unocss.dev
+- Element Plus Docs: https://element-plus.org
+- Vue 3 Docs: https://vuejs.org
+- Nuxt 3 Docs: https://nuxt.com
+- @paradoxai/ui: Component library (internal)
+- Design Tokens: `@paradoxai/design-tokens` package

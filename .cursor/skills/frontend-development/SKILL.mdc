@@ -1,0 +1,462 @@
+---
+name: frontend-dev-guidelines
+description: Frontend development guidelines for Vue 3/Nuxt 3 applications. Modern patterns including Composition API, lazy loading, useAsyncData/useListData, file organization with areas directory, UnoCSS styling, Nuxt routing, performance optimization, and TypeScript best practices. Use when creating components, pages, features, fetching data, styling, routing, or working with frontend code.
+---
+
+# Frontend Development Guidelines
+
+## Purpose
+
+Comprehensive guide for modern Vue 3/Nuxt 3 development, emphasizing Composition API, lazy loading, proper file organization, and performance optimization.
+
+## When to Use This Skill
+
+- Creating new components or pages
+- Building new features in areas/
+- Fetching data with useAsyncData/useListData
+- Setting up routing with Nuxt file-based routing
+- Styling components with UnoCSS
+- Performance optimization
+- Organizing frontend code
+- TypeScript best practices
+
+---
+
+## Quick Start
+
+### New Component Checklist
+
+Creating a component? Follow this checklist:
+
+- [ ] Use `<script setup lang="ts">` pattern
+- [ ] Use `defineOptions` for component name
+- [ ] Define props with `defineProps<Props>()` and `withDefaults`
+- [ ] Define emits with `defineEmits<Emits>()`
+- [ ] Lazy load if heavy component: `defineAsyncComponent(() => import())`
+- [ ] Use `useAsyncData` or `useListData` for data fetching
+- [ ] Use `v-loading` directive for loading states (no early returns)
+- [ ] Use UnoCSS with `:uno:` prefix for styling
+- [ ] Use composables from `#area-name/composables`
+- [ ] Use `useLoggedIn()` or `useAuth()` for authentication
+
+### New Feature Checklist
+
+Creating a feature in an area? Set up this structure:
+
+- [ ] Create feature in `areas/{area-name}/app/`
+- [ ] Create subdirectories: `api/`, `components/`, `composables/`, `pages/`, `types/`
+- [ ] Create API service file: `api/{feature}Api.ts` using `$http`
+- [ ] Create composable wrapper: `composables/useApi{Feature}.ts`
+- [ ] Set up TypeScript types in `types/`
+- [ ] Create pages in `pages/` directory (file-based routing)
+- [ ] Use `definePageMeta` for route metadata
+- [ ] Lazy load heavy components
+- [ ] Export public API from composables
+
+---
+
+## Import Patterns
+
+### Auto-Imports (Nuxt 3)
+
+Nuxt 3 automatically imports:
+- Vue 3 Composition API (`ref`, `computed`, `watch`, etc.)
+- Nuxt composables (`useRoute`, `useRouter`, `navigateTo`, etc.)
+- Components from `@paradoxai/ui` (Ol* components)
+- Element Plus components (El* components)
+- Area composables via `#area-name/composables`
+
+**No explicit imports needed:**
+```vue
+<script setup lang="ts">
+// ref, computed, watch are auto-imported
+const count = ref(0)
+const doubled = computed(() => count.value * 2)
+
+// useRoute, useRouter are auto-imported
+const route = useRoute()
+const router = useRouter()
+
+// Components are auto-imported
+</script>
+
+<template>
+  <!-- OlButton, OlDialog, etc. are auto-imported -->
+  <OlButton @click="count++">Click</OlButton>
+</template>
+```
+
+### Area Composable Imports
+
+```typescript
+// Import composables from specific areas
+import { useApiSiteDetails } from '#site-studio/composables'
+import { useApiJobDataPackages } from '#datafeed/composables'
+import { useListData } from '#common/composables'
+```
+
+---
+
+## Topic Guides
+
+### 🎨 Component Patterns
+
+**Modern Vue 3 components use:**
+- `<script setup lang="ts">` for Composition API
+- `defineProps<Props>()` with `withDefaults` for props
+- `defineEmits<Emits>()` for type-safe events
+- `defineOptions` for component name
+- `defineAsyncComponent` for lazy loading
+
+**Key Concepts:**
+- Lazy load heavy components (drawers, modals, complex forms)
+- Use `v-loading` directive for loading states
+- Component structure: Options → Props → Emits → Logic → Template
+- Use composables for reusable logic
+
+**[📖 Complete Guide: resources/component-patterns.md](resources/component-patterns.md)**
+
+---
+
+### 📊 Data Fetching
+
+**PRIMARY PATTERN: useAsyncData**
+- Use for single data fetches
+- Built-in SSR support
+- Automatic request deduplication
+- Type-safe with generics
+
+**Paginated Lists: useListData**
+- Use for paginated lists with search
+- Built-in pagination and debouncing
+- Server/client state management
+
+**API Service Layer:**
+- Create `areas/{area}/app/api/{feature}Api.ts`
+- Use `$http.$get`, `$http.$post`, `$http.$put`, `$http.$delete`
+- Route format: `/feature/route` (NOT `/api/feature/route`)
+- Create composable wrapper: `composables/useApi{Feature}.ts`
+
+**[📖 Complete Guide: resources/data-fetching.md](resources/data-fetching.md)**
+
+---
+
+### 📁 File Organization
+
+**Areas Structure:**
+- `areas/` - Domain-specific features (admin, analytics, auth, etc.)
+- Each area is a Nuxt module with its own `app/` directory
+- Areas can have: `api/`, `components/`, `composables/`, `pages/`, `types/`
+
+**Area Subdirectories:**
+```
+areas/
+  my-area/
+    app/
+      api/          # API service layer
+      components/   # Area components
+      composables/  # Custom composables
+      pages/        # File-based routes
+      types/        # TypeScript types
+```
+
+**Common Components:**
+- Shared components in `areas/common/app/components/`
+- UI library components from `@paradoxai/ui` (auto-imported)
+
+**[📖 Complete Guide: resources/file-organization.md](resources/file-organization.md)**
+
+---
+
+### 🎨 Styling
+
+**UnoCSS with `:uno:` Prefix:**
+- Use `:uno:` prefix for UnoCSS classes
+- Mobile-first responsive design
+- Design tokens from `@paradoxai/design-tokens`
+- Variant groups: `sm:(flex flex-col gap-4)`
+
+**Color Tokens:**
+- Semantic: `primary`, `success`, `danger`, `warning`, `info`
+- Base: `grey`, `blue`, `red`, `green`, `yellow`
+- Shades: `50`, `100`, `200`, ..., `900`
+
+**Breakpoints:**
+- `xs: 576px`, `sm: 768px`, `md: 992px`, `lg: 1200px`, `xl: 1440px`
+- Max-width: `max-sm:`, `max-md:`, etc.
+- Less-than: `<sm:`, `<md:`, etc.
+
+**[📖 Complete Guide: resources/styling-guide.md](resources/styling-guide.md)**
+
+---
+
+### 🛣️ Routing
+
+**Nuxt 3 File-Based Routing:**
+- Directory: `pages/my-route/index.vue`
+- Dynamic routes: `pages/posts/[id].vue`
+- Nested routes: `pages/posts/[id]/edit.vue`
+- Use `definePageMeta` for route metadata
+- Use `useRoute()` and `useRouter()` for navigation
+
+**Example:**
+```vue
+<script setup lang="ts">
+definePageMeta({
+  auth: true,
+  layout: 'cem',
+  permission: {
+    view: ACL_POSTS,
+  },
+})
+
+useHead({
+  title: 'Posts',
+})
+</script>
+```
+
+**[📖 Complete Guide: resources/routing-guide.md](resources/routing-guide.md)**
+
+---
+
+### ⏳ Loading & Error States
+
+**CRITICAL RULE: No Early Returns**
+
+```vue
+<!-- ❌ NEVER - Causes layout shift -->
+<template>
+  <div v-if="pending">
+    <OlSpinner />
+  </div>
+  <div v-else>
+    <Content :data="data" />
+  </div>
+</template>
+
+<!-- ✅ ALWAYS - Consistent layout -->
+<template>
+  <div v-loading="pending">
+    <Content v-if="data" :data="data" />
+  </div>
+</template>
+```
+
+**Why:** Prevents Cumulative Layout Shift (CLS), better UX
+
+**Error Handling:**
+- Use `whenError` for `useAsyncData` errors
+- Use `withCatch` for mutations
+- Use `OlNotify` for user feedback
+- Handle server validation errors separately
+
+**[📖 Complete Guide: resources/loading-and-error-states.md](resources/loading-and-error-states.md)**
+
+---
+
+### ⚡ Performance
+
+**Optimization Patterns:**
+- `computed`: Expensive computations (filter, sort, map)
+- Stable function references (define outside setup)
+- `markRaw`: Component definitions and third-party instances
+- `shallowRef`: Large objects and VNodes
+- Debounced search (300-500ms) with `useDebounceFn` or `useListData`
+- Memory leak prevention (cleanup in `onUnmounted`)
+
+**[📖 Complete Guide: resources/performance.md](resources/performance.md)**
+
+---
+
+### 📘 TypeScript
+
+**Standards:**
+- Strict mode, no `any` type
+- Explicit return types on functions and composables
+- Type imports: `import type { User } from '#common/types/user'`
+- Component props: `defineProps<Props>()` with interfaces
+- Component emits: `defineEmits<Emits>()` with interfaces
+- Composable return types: Explicit interfaces
+
+**[📖 Complete Guide: resources/typescript-standards.md](resources/typescript-standards.md)**
+
+---
+
+### 🔧 Common Patterns
+
+**Covered Topics:**
+- Forms with OlForm + Element Plus validation
+- Authentication with `useLoggedIn()` and `useAuth()`
+- Dialog/Drawer component patterns
+- Data fetching with `useAsyncData` and `useListData`
+- Mutation patterns with `withCatch`
+- Error handling patterns
+
+**[📖 Complete Guide: resources/common-patterns.md](resources/common-patterns.md)**
+
+---
+
+### 📚 Complete Examples
+
+**Full working examples:**
+- Modern Vue component with all patterns
+- Complete area structure
+- API service layer
+- Page with lazy loading
+- useAsyncData + useListData
+- Form with validation
+
+**[📖 Complete Guide: resources/complete-examples.md](resources/complete-examples.md)**
+
+---
+
+## Navigation Guide
+
+| Need to... | Read this resource |
+|------------|-------------------|
+| Create a component | [component-patterns.md](resources/component-patterns.md) |
+| Fetch data | [data-fetching.md](resources/data-fetching.md) |
+| Organize files/folders | [file-organization.md](resources/file-organization.md) |
+| Style components | [styling-guide.md](resources/styling-guide.md) |
+| Set up routing | [routing-guide.md](resources/routing-guide.md) |
+| Handle loading/errors | [loading-and-error-states.md](resources/loading-and-error-states.md) |
+| Optimize performance | [performance.md](resources/performance.md) |
+| TypeScript types | [typescript-standards.md](resources/typescript-standards.md) |
+| Forms/Auth/DataGrid | [common-patterns.md](resources/common-patterns.md) |
+| See full examples | [complete-examples.md](resources/complete-examples.md) |
+
+---
+
+## Core Principles
+
+1. **Lazy Load Everything Heavy**: Routes, drawers, modals, complex forms
+2. **v-loading for Loading**: Use `v-loading` directive, not early returns
+3. **useAsyncData/useListData**: Primary data fetching patterns
+4. **Areas are Organized**: api/, components/, composables/, pages/, types/ subdirs
+5. **UnoCSS with :uno: Prefix**: Always use `:uno:` prefix for styling
+6. **Auto-Imports**: Leverage Nuxt 3 auto-imports (no explicit imports needed)
+7. **No Early Returns**: Prevents layout shift
+8. **TypeScript First**: Full type safety with interfaces
+
+---
+
+## Quick Reference: File Structure
+
+```
+areas/
+  my-area/
+    app/
+      api/
+        myFeatureApi.ts       # API service ($http)
+      composables/
+        useApiMyFeature.ts    # Composable wrapper
+      components/
+        MyFeature.vue         # Main component
+        SubComponent.vue       # Related components
+      pages/
+        index.vue             # Route: /my-area
+        create.vue            # Route: /my-area/create
+        [id].vue              # Route: /my-area/:id
+        [id]/
+          edit.vue            # Route: /my-area/:id/edit
+      types/
+        index.ts              # TypeScript types
+    uno.config.js             # UnoCSS config
+    nuxt.config.ts            # Nuxt config
+    package.json              # Dependencies
+
+areas/common/
+  app/
+    components/               # Shared components
+    composables/              # Shared composables (useListData, etc.)
+```
+
+---
+
+## Modern Component Template (Quick Copy)
+
+```vue
+<script setup lang="ts">
+/**
+ * Component description
+ * What it does, when to use it
+ */
+
+defineOptions({
+  name: 'MyComponent',
+})
+
+interface Props {
+  /** The ID of the entity to display */
+  id: number
+  /** Optional callback when action completes */
+  onComplete?: () => void
+  /** Display mode */
+  mode?: 'view' | 'edit'
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  mode: 'view',
+})
+
+interface Emits {
+  (e: 'action'): void
+  (e: 'update', value: string): void
+}
+
+const emit = defineEmits<Emits>()
+
+// Data fetching
+const {
+  data: entityData,
+  pending,
+  error,
+} = useAsyncData(
+  `entity-${props.id}`,
+  () => api.getEntity(props.id),
+  {
+    server: false,
+  }
+)
+
+whenError(error, () => {
+  OlNotify.error?.({ message: 'Failed to load entity' })
+})
+
+// Computed
+const displayName = computed(() => entityData.value?.name ?? 'Unknown')
+
+// Handlers
+function handleAction() {
+  emit('action')
+  props.onComplete?.()
+}
+</script>
+
+<template>
+  <div v-loading="pending" class=":uno: p-4">
+    <div v-if="entityData" class=":uno: bg-white rounded-lg p-6">
+      <h2 class=":uno: text-xl font-semibold mb-4">
+        {{ displayName }}
+      </h2>
+      <OlButton @click="handleAction">
+        Action
+      </OlButton>
+    </div>
+  </div>
+</template>
+```
+
+For complete examples, see [resources/complete-examples.md](resources/complete-examples.md)
+
+---
+
+## Related Skills
+
+- **ui-styling**: UnoCSS styling, @paradoxai/ui components, design tokens
+- **backend-dev-guidelines**: Backend API patterns that frontend consumes
+
+---
+
+**Skill Status**: Modular structure with progressive loading for optimal context management
