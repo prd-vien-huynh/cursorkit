@@ -4,6 +4,8 @@ Lookup table for every SCSS variable in `client/assets/styles/_variables.scss` (
 
 When the legacy hex code matches a design-token value (within ~1 hex unit, or after rounding), use the token utility. When it doesn't match anything in `@paradoxai/design-tokens` (e.g. `$color-electric-violet: #7549fa`), fall back to an arbitrary utility (`text-[#7549fa]`). Don't pick a vaguely-similar token — visual mismatches are worse than honest arbitraries.
 
+**Variable not in this file?** If an SCSS variable has no row below, do not guess a mapping. Resolve its value from source, apply the best token or arbitrary fallback, and add `//TODO` on the line immediately before the migrated utility in the Vue file (see [SKILL.md — Unmapped SCSS variables](../SKILL.md#unmapped-scss-variables--add-todo)). After review, add the variable to this table and remove the `//TODO`.
+
 ## Table of contents
 
 - [1. Brand / semantic colors](#1-brand--semantic-colors)
@@ -370,3 +372,5 @@ When you're unsure whether to use a token or an arbitrary utility, apply this ru
 4. Is it a CSS custom property (`var(--header-height)`)? → **Preserve the var**: `pt-[var(--header-height)]`.
 
 When the user reviews your migration diff, arbitrary utilities are easy to upgrade to tokens later if they decide to add the missing token. Wrong-token migrations are silent visual regressions — much harder to catch.
+
+5. Is the SCSS **variable name** missing from this file entirely? → Resolve value, apply fallback utility, and add `//TODO` before it in the migrated component.

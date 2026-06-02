@@ -23,7 +23,7 @@ Track progress with this checklist (copy into your reply once, then update):
 ```
 - [ ] Step 1: Read the source SCSS (in-SFC or external)
 - [ ] Step 2: Read the source template so class names line up with selectors
-- [ ] Step 3: Build a per-selector mapping plan
+- [ ] Step 3: Build a per-selector mapping plan (`//TODO` for variables missing from token-mapping.md)
 - [ ] Step 4: Apply utilities to template; remove the <style> block
 - [ ] Step 5: Self-check (no SCSS leftovers, tokens used, deep selectors handled)
 ```
@@ -53,6 +53,39 @@ For values that aren't on any token scale (random hex codes from `_variables.scs
 
 For deep file-by-file token lookups (the full SCSS-variable → utility table), see [references/token-mapping.md](references/token-mapping.md).
 
+#### Unmapped SCSS variables — add `//TODO`
+
+When an SCSS **variable** (e.g. `$color-foo`, `$spacing-xyz`, `$font-size-custom`) has **no row** in [references/token-mapping.md](references/token-mapping.md) or the Mapping Reference tables below, mark it before migrating:
+
+1. **Do not** invent a token name or pick a “close enough” utility by guesswork.
+2. Resolve the raw value from `_variables.scss` (or the literal in the rule) and use the best fallback: token utility if the hex/px happens to match a design token, otherwise an arbitrary utility (`text-[#7549fa]`, `p-[13px]`).
+3. Put **`//TODO` on the line immediately before** the migrated class/utility, with the original variable name:
+
+**In `<template>`** — HTML comment on the line above the element:
+
+```html
+<!-- //TODO: $color-brand-accent — no UnoCSS mapping -->
+<span class=":uno: text-[#7549fa]">...</span>
+```
+
+**In `:class` arrays** — JS comment on the line before the class string:
+
+```vue
+:class="[
+  // TODO: $spacing-custom — no UnoCSS mapping
+  ':uno: p-[13px]',
+]"
+```
+
+**In a kept `<style>` fragment** (rare) — SCSS comment before the declaration:
+
+```scss
+// TODO: $shadow-custom — no UnoCSS mapping
+box-shadow: 0 2px 8px rgba(99, 99, 99, 0.2);
+```
+
+List every `//TODO` in the migration summary so reviewers can add missing entries to `token-mapping.md` or design tokens later.
+
 ### Step 4 — Apply and clean
 
 Apply the utilities to the template. Then **delete the `<style>` block entirely** (or its `.scss` sidecar import). If a small block must remain (rare — e.g. `@keyframes` not yet expressible as a UnoCSS animation), keep only that fragment with a one-line `// keep: <reason>` comment so the next reviewer understands why.
@@ -66,6 +99,7 @@ Before reporting done, verify:
 - [ ] No `@import`, `@include`, or SCSS variable references (`$color-...`) anywhere in the file
 - [ ] Every utility class string is prefixed with `:uno:` so the extractor picks it up (this repo's convention — see `packages/ui/src/preset/extractors`)
 - [ ] No invented design-token names that don't exist in `@paradoxai/design-tokens` — when unsure, fall back to arbitrary values
+- [ ] Every SCSS variable with no mapping in `token-mapping.md` has a `//TODO` comment on the line before its migrated utility
 - [ ] Hover/focus/active/disabled/responsive variants from `&:hover` etc. all preserved
 
 ## The `:uno:` prefix
@@ -124,7 +158,7 @@ The token names live in `@paradoxai/design-tokens/uno` (re-exported by `node_mod
 | `$color-black` | `text-black` / `bg-black` | |
 | `$skeleton-color` / `$background-color-base` | `bg-grey-200` | `#f2f2f2` / `#f7f7f7` |
 
-**Anything not in the table:** if it's a random one-off color (`$color-electric-violet: #7549fa`, `$color-japonica`, etc.), use an arbitrary utility — `text-[#7549fa]` — rather than picking a vaguely-similar token. Token mismatches are visually worse than honest arbitrary values.
+**Anything not in the table:** if it's a random one-off color (`$color-electric-violet: #7549fa`, `$color-japonica`, etc.), use an arbitrary utility — `text-[#7549fa]` — rather than picking a vaguely-similar token. Token mismatches are visually worse than honest arbitrary values. If the **variable name itself** is missing from [references/token-mapping.md](references/token-mapping.md), add `//TODO` on the line before the utility (see [Unmapped SCSS variables](#unmapped-scss-variables--add-todo) above).
 
 ### Sizing & spacing
 
@@ -282,7 +316,22 @@ After:
 </template>
 ```
 
-Note `mb-[30px]` is arbitrary — `30px` ≠ any spacing token (`xl` is `2rem`/`32px`). Don't round to `mb-8`; that's a visual change.
+Note `mb-[30px]` is arbitrary — `30px` ≠ any spacing token (`xl` is `2rem`/`32px`). Don't round to `mb-8`; that's a visual change. Raw pixel values do **not** need `//TODO`; only **unlisted SCSS variables** do.
+
+**Example 1b — unmapped SCSS variable**
+
+Before:
+```scss
+.badge {
+  color: $color-brand-accent; // defined in component SCSS, not in _variables.scss
+}
+```
+
+After (variable not in `token-mapping.md`):
+```vue
+<!-- //TODO: $color-brand-accent — no UnoCSS mapping -->
+<span class=":uno: text-[#7549fa]">...</span>
+```
 
 **Example 2 — hover, conditional, deep**
 
@@ -356,7 +405,8 @@ This is the pattern used in `areas/employee-experience/app/pages/employee-experi
 After migration, summarize for the user:
 - Files changed (template, removed `<style>`, removed `.scss`)
 - Any selector that had no template match (you flagged it as dead style)
-- Any value that fell back to an arbitrary utility because no token matched
+- Any SCSS variable marked with `//TODO` because it had no entry in `token-mapping.md` (list variable name + fallback utility used)
+- Any value that fell back to an arbitrary utility because no token matched (but variable *was* mapped)
 - Any block deliberately *not* migrated (with reason — e.g. `@keyframes` left in place)
 
 This makes the diff easy to review and surfaces anything that needs a designer's eye.
